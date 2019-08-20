@@ -2,7 +2,7 @@ import React from 'react';
 import {classNames} from '../../../../utilities/css';
 import {buttonsFrom} from '../../../Button';
 import {useMediaQuery} from '../../../../utilities/media-query';
-import {ComplexAction, MenuGroupDescriptor} from '../../../../types';
+import {MenuGroupDescriptor, MenuActionDescriptor} from '../../../../types';
 import {Breadcrumbs, BreadcrumbsProps} from '../../../Breadcrumbs';
 
 import {Pagination, PaginationDescriptor} from '../../../Pagination';
@@ -24,7 +24,7 @@ export interface HeaderProps extends TitleProps {
   /** Collection of breadcrumbs */
   breadcrumbs?: BreadcrumbsProps['breadcrumbs'];
   /** Collection of secondary page-level actions */
-  secondaryActions?: ComplexAction[];
+  secondaryActions?: MenuActionDescriptor[];
   /** Collection of page-level groups of secondary actions */
   actionGroups?: MenuGroupDescriptor[];
 }
