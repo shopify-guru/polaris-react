@@ -5,18 +5,24 @@ export function sortAndOverrideActionOrder(
 ) {
   const sortedActionsWithOverrides = actions
     .filter((action) => action.index !== undefined)
-    .sort(({index: indexA = 0}, {index: indexB = 0}) => {
-      return indexA - indexB;
-    });
+    .sort(({index: indexA = 0}, {index: indexB = 0}) => indexA - indexB);
 
-  const overriddenActions: (
-    | MenuActionDescriptor
-    | MenuGroupDescriptor)[] = actions.filter(
+  if (sortedActionsWithOverrides.length === 0) {
+    return actions;
+  }
+
+  const actionsWithoutOverrides = actions.filter(
     (action) => action.index === undefined,
   );
 
+  const overriddenActions: (MenuActionDescriptor | MenuGroupDescriptor)[] = [
+    ...actionsWithoutOverrides,
+  ];
+
   sortedActionsWithOverrides.forEach((action) => {
-    action.index && overriddenActions.splice(action.index, 0, action);
+    if (action.index !== undefined) {
+      overriddenActions.splice(action.index, 0, action);
+    }
   });
 
   return overriddenActions;

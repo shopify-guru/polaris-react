@@ -46,7 +46,7 @@ describe('<ActionMenu />', () => {
       );
     });
 
-    it('renders actions in their overridden order when their index set', () => {
+    it('renders an action in its overridden order when index is set', () => {
       const overrideIndex = 1;
       const actionWithIndex = {
         content: 'mock content 1',
@@ -68,22 +68,64 @@ describe('<ActionMenu />', () => {
       ).toBe(actionWithIndex.content);
     });
 
-    it('renders actions in their initial order when their index is not set', () => {
-      const overrideIndex = 1;
-      const actionWithIndex = {
-        content: 'mock content 1',
-        index: overrideIndex,
-      };
+    it('renders all actions in their overridden order when multiple indexes are set', () => {
+      const actionsBeforeOverride: ActionMenuProps['actions'] = [
+        {content: 'mock content 4', index: 3},
+        {content: 'mock content 1', index: 0},
+        {content: 'mock content 2'},
+        {content: 'mock content 5', index: 4},
+        {content: 'mock content 3'},
+      ];
 
+      const expectedOrderAfterOverride = [
+        {content: 'mock content 1', index: 0},
+        {content: 'mock content 2'},
+        {content: 'mock content 3'},
+        {content: 'mock content 4', index: 3},
+        {content: 'mock content 5', index: 4},
+      ];
+
+      const wrapper = mountWithAppProvider(
+        <ActionMenu actions={actionsBeforeOverride} />,
+      );
+
+      wrapper.find(MenuAction).forEach((action, index) => {
+        expect(action.props()).toMatchObject(expectedOrderAfterOverride[index]);
+      });
+    });
+
+    it('renders actions with the same set index consecutively, in order from highest initial index to lowest', () => {
+      const actionsBeforeOverride: ActionMenuProps['actions'] = [
+        {content: 'mock content 3', index: 0},
+        {content: 'mock content 2', index: 0},
+        {content: 'mock content 1', index: 0},
+      ];
+
+      const expectedOrderAfterOverride = [
+        {content: 'mock content 1', index: 0},
+        {content: 'mock content 2', index: 0},
+        {content: 'mock content 3', index: 0},
+      ];
+
+      const wrapper = mountWithAppProvider(
+        <ActionMenu actions={actionsBeforeOverride} />,
+      );
+
+      wrapper.find(MenuAction).forEach((action, index) => {
+        expect(action.props()).toMatchObject(expectedOrderAfterOverride[index]);
+      });
+    });
+
+    it('renders actions in their initial order when no indexes are set', () => {
       const actionsBeforeOverriddenOrder: ActionMenuProps['actions'] = [
-        actionWithIndex,
         {content: 'mock content 0'},
+        {content: 'mock content 1'},
         {content: 'mock content 2'},
       ];
 
       const expectedOrderAfterOverride = [
         {content: 'mock content 0'},
-        actionWithIndex,
+        {content: 'mock content 1'},
         {content: 'mock content 2'},
       ];
 
@@ -134,7 +176,7 @@ describe('<ActionMenu />', () => {
       );
     });
 
-    it('renders groups at their overriden order when their index is set', () => {
+    it('renders a group at its overriden order when index is set', () => {
       const overrideIndex = 1;
       const groupWithIndex = {
         title: 'group with explicit order in menu',
@@ -153,27 +195,87 @@ describe('<ActionMenu />', () => {
       ).toBe(groupWithIndex.title);
     });
 
-    it('renders groups in their initial order when their index is not set', () => {
-      const overrideIndex = 1;
-      const groupWithIndex = {
-        title: 'group with explicit order in menu',
-        actions: [{content: 'mock content 1'}],
-        index: overrideIndex,
+    it('renders all groups in their overridden order when multiple indexes are set', () => {
+      const overrideIndexZero = {
+        title: 'Mock group 1',
+        actions: [{content: 'mock content'}],
+        index: 0,
       };
 
-      const groupsBeforeOverriddenOrder = [...mockGroups, groupWithIndex];
+      const overrideIndexTwo = {
+        title: 'Mock group 3',
+        actions: [{content: 'mock content'}],
+        index: 2,
+      };
+
+      const overrideIndexThree = {
+        title: 'Mock group 4',
+        actions: [{content: 'mock content'}],
+        index: 3,
+      };
+
+      const groupsWithIndexes = [
+        overrideIndexZero,
+        overrideIndexThree,
+        overrideIndexTwo,
+      ];
+
+      const groups = [...mockGroups, ...groupsWithIndexes];
       const expectedOrderAfterOverride = [
+        overrideIndexZero,
         mockGroups[0],
-        groupWithIndex,
+        overrideIndexTwo,
+        overrideIndexThree,
         mockGroups[1],
       ];
 
-      const wrapper = mountWithAppProvider(
-        <ActionMenu groups={groupsBeforeOverriddenOrder} />,
-      );
+      const wrapper = mountWithAppProvider(<ActionMenu groups={groups} />);
 
       wrapper.find(MenuGroup).forEach((group, index) => {
         expect(group.props()).toMatchObject(expectedOrderAfterOverride[index]);
+      });
+    });
+
+    it('renders groups with the same set index consecutively, in order from highest initial index to lowest', () => {
+      const groupsWithIndexes = [
+        {
+          title: 'Mock group 3',
+          actions: [{content: 'mock content'}],
+          index: 0,
+        },
+        {
+          title: 'Mock group 2',
+          actions: [{content: 'mock content'}],
+          index: 0,
+        },
+        {
+          title: 'Mock group 1',
+          actions: [{content: 'mock content'}],
+          index: 0,
+        },
+      ];
+
+      const groups = [...mockGroups, ...groupsWithIndexes];
+      const expectedOrderAfterOverride = [
+        groupsWithIndexes[2],
+        groupsWithIndexes[1],
+        groupsWithIndexes[0],
+        mockGroups[0],
+        mockGroups[1],
+      ];
+
+      const wrapper = mountWithAppProvider(<ActionMenu groups={groups} />);
+
+      wrapper.find(MenuGroup).forEach((group, index) => {
+        expect(group.props()).toMatchObject(expectedOrderAfterOverride[index]);
+      });
+    });
+
+    it('renders groups in their initial order when no indexes are set', () => {
+      const wrapper = mountWithAppProvider(<ActionMenu groups={mockGroups} />);
+
+      wrapper.find(MenuGroup).forEach((group, index) => {
+        expect(group.props()).toMatchObject(mockGroups[index]);
       });
     });
   });
